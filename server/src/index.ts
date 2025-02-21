@@ -1,37 +1,41 @@
-import express from "express";
+import express, { Application } from "express";
 import { ApolloServer } from "@apollo/server";
 import { expressMiddleware } from "@apollo/server/express4";
 import bodyParser from "body-parser";
-import dotenv from "dotenv";
+import "dotenv/config";
 import {
     resolvers,
     typeDefs
 } from "./graphql";
+import { connectDatabase } from "./database";
 
-dotenv.config();
-
-const server = new ApolloServer({ typeDefs, resolvers });
-const port = process.env.PORT || 3000;
-
-const main = async () => {
+const mount = async (app: Application) => {
+    const db = await connectDatabase();
+    const server = new ApolloServer({
+        typeDefs,
+        resolvers
+    });
     await server.start();
 
-    const app = express();
-
-    // Middleware
-    app.use(bodyParser.json());
 
     // Apollo Server
-    app.use("/api", expressMiddleware(server));
+    app.use("/api", bodyParser.json(), expressMiddleware(server, {
+        context: async ({ req }) => ({
+            headers: req.headers,
+        }),
+    }));
 
     // Server start
-    app.listen(port, () => {
-        console.log(`[server] Server running on port ${port}`);
-        console.log(`[graphql] Playground available at http://localhost:${port}/api`);
+    app.listen(process.env.PORT, () => {
+        console.log(`[server] Server running on port ${process.env.PORT}`);
+        console.log(`[graphql] Playground available at http://localhost:${process.env.PORT}/api`);
     });
+
+    const listings = await db.listings.find({}).toArray();
+    console.log({ listings });
 };
 
-main().catch((error) => {
+mount(express()).catch((error) => {
     console.error("[server] Failed to start server:", error);
     process.exit(1);
 });
