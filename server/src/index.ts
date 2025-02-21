@@ -3,12 +3,14 @@ import { ApolloServer } from "@apollo/server";
 import { expressMiddleware } from "@apollo/server/express4";
 import bodyParser from "body-parser";
 import dotenv from "dotenv";
-
-import { schema } from "./graphql";
+import {
+    resolvers,
+    typeDefs
+} from "./graphql";
 
 dotenv.config();
 
-const server = new ApolloServer({ schema });
+const server = new ApolloServer({ typeDefs, resolvers });
 const port = process.env.PORT || 3000;
 
 const main = async () => {
