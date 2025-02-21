@@ -1,6 +1,6 @@
 import express from "express";
-import { ApolloServer } from '@apollo/server';
-import { expressMiddleware } from '@apollo/server/express4';
+import { ApolloServer } from "@apollo/server";
+import { expressMiddleware } from "@apollo/server/express4";
 import bodyParser from "body-parser";
 import dotenv from "dotenv";
 
@@ -13,15 +13,15 @@ const port = process.env.PORT || 3000;
 
 const main = async () => {
     await server.start();
-    
+
     const app = express();
-    
+
     // Middleware
     app.use(bodyParser.json());
-    
+
     // Apollo Server
-    app.use('/api', expressMiddleware(server));
-    
+    app.use("/api", expressMiddleware(server));
+
     // Server start
     app.listen(port, () => {
         console.log(`[server] Server running on port ${port}`);
@@ -30,6 +30,6 @@ const main = async () => {
 };
 
 main().catch((error) => {
-    console.error('[server] Failed to start server:', error);
+    console.error("[server] Failed to start server:", error);
     process.exit(1);
 });
