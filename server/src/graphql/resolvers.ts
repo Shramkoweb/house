@@ -1,4 +1,7 @@
-import { ObjectId } from "mongodb";
+import {
+    ObjectId,
+    WithId
+} from "mongodb";
 import {
     Database,
     Listing
@@ -6,12 +9,14 @@ import {
 
 export const resolvers = {
     Query: {
-        listings: async (_root: undefined, __: {}, { db }: { db: Database }) => {
+        listings: async (_root: undefined, __: {}, { db }: { db: Database }): Promise<Array<WithId<Listing> >> => {
             return await db.listings.find().toArray();
         }
     },
     Mutation: {
-        deleteListing: async (_root: undefined, { id }: { id: string }, { db }: { db: Database }) => {
+        deleteListing: async (_root: undefined, { id }: { id: string }, { db }: {
+            db: Database
+        }): Promise<WithId<Listing>> => {
             const deletedListing = await db.listings.findOneAndDelete({ _id: new ObjectId(id) });
 
             if (!deletedListing) {
@@ -23,6 +28,6 @@ export const resolvers = {
         }
     },
     Listing: {
-        id: (listing: Listing) => listing._id,
+        id: (listing: Listing): string => listing._id.toString(),
     }
 };
