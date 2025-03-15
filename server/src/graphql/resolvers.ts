@@ -1,26 +1,28 @@
-import { LISTINGS } from "../listings";
 import { ObjectId } from "mongodb";
-import { Database } from "../lib/types";
+import {
+    Database,
+    Listing
+} from "../lib/types";
 
 export const resolvers = {
     Query: {
-        listings: async (_: undefined, __: {}, { db }: { db: Database }) => {
+        listings: async (_root: undefined, __: {}, { db }: { db: Database }) => {
             return await db.listings.find().toArray();
         }
     },
     Mutation: {
-        deleteListing: (_root: undefined, { id }: { id: ObjectId }) => {
-            for (let i = 0; i < LISTINGS.length; i++) {
-                if (LISTINGS[i]._id === id) {
-                    return LISTINGS.splice(i, 1)[0];
-                }
+        deleteListing: async (_root: undefined, { id }: { id: string }, { db }: { db: Database }) => {
+            const deletedListing = await db.listings.findOneAndDelete({ _id: new ObjectId(id) });
+
+            if (!deletedListing) {
+                throw new Error("failed to deleted listing");
             }
 
-            throw new Error("failed to deleted listing");
+            return deletedListing;
+
         }
     },
     Listing: {
-        // TODO: any :cry
-        id: (listing: any) => listing._id,
+        id: (listing: Listing) => listing._id,
     }
 };
