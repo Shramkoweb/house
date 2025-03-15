@@ -3,6 +3,7 @@ import { ApolloServer } from "@apollo/server";
 import { expressMiddleware } from "@apollo/server/express4";
 import bodyParser from "body-parser";
 import "dotenv/config";
+import cors from "cors";
 import {
     resolvers,
     typeDefs
@@ -27,6 +28,17 @@ const mount = async (app: Application) => {
     });
 
     console.log(`[server] GraphQL API available at ${url}`);
+
+    // TODO: Tmp
+    app.use(cors({
+        origin: "http://localhost:5173",
+        methods: [
+            "GET",
+            "POST"
+        ],
+        allowedHeaders: ["Content-Type"] // Allowed headers
+    }));
+
 
     // Apollo Server
     app.use("/api", bodyParser.json(), expressMiddleware(server, {

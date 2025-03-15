@@ -2,6 +2,7 @@
   "name": "client",
   "private": true,
   "type": "module",
+  "proxy": "http://localhost:9000",
   "scripts": {
     "build": "react-router build",
     "dev": "react-router dev",
